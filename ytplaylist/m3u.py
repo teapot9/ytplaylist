@@ -312,13 +312,17 @@ def main_xspf_list() -> None:
         print(item)
 
 
-def copy_files(src: str, dst: str) -> None:
+def copy_files(src: str, dst: str, force: bool = False) -> None:
     """Copy files from an M3U playlist into a directory"""
     for file in m3u_list(src):
         if not path.isabs(file):
             file = path.join(path.dirname(src), file)
         dst_file = path.join(dst, path.basename(file))
-        shutil.copy(file, dst_file, follow_symlinks=True)
+        if not force and not path.isfile(dst_file):
+            logger.info("Copying %s -> %s", file, dst_file)
+            shutil.copy(file, dst_file, follow_symlinks=True)
+        else:
+            logger.debug("%s: already present", dst_file)
 
 
 def main_copy() -> None:
